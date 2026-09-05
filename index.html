@@ -661,12 +661,16 @@
       message: 'Event registration: ' + name + ' | Source: ' + source,
       name: name
     };
+    console.log('form submit payload', payload);
     fetch('https://dover-sip-duties-procedures.trycloudflare.com/api/identify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
+    }).then(function(res){
+      console.log('crm status', res.status);
+      return res.text().then(function(t){ console.log('crm body', t); });
     }).catch(function(err){ console.error('CRM capture failed', err); });
-    window.location = PAYNOW;
+    setTimeout(function(){ window.location = PAYNOW; }, 600);
   });
 </script>
 
