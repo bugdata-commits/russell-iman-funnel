@@ -658,26 +658,22 @@
     var wa = document.getElementById('whatsapp').value.trim();
     var email = document.getElementById('email').value.trim();
     var source = document.getElementById('source').value;
-    var payload = {
+    var qs = new URLSearchParams({
       phone: wa.replace(/\s+/g, ''),
-      message: 'Event registration: ' + name + ' | Source: ' + source,
-      name: name
-    };
-    console.log('form submit payload', payload);
+      name: name,
+      message: 'Event registration: ' + name + ' | Source: ' + source
+    });
+    var beaconUrl = 'https://dover-sip-duties-procedures.trycloudflare.com/api/identify?' + qs.toString();
     if(statusEl) statusEl.textContent = 'Capturing your registration...';
-    fetch('https://dover-sip-duties-procedures.trycloudflare.com/api/identify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(function(res){
-      console.log('crm status', res.status);
+    fetch(beaconUrl, {method:'GET', mode:'no-cors'}).then(function(){
       if(statusEl) statusEl.textContent = 'Registration captured. Redirecting to payment...';
-      return res.text().then(function(t){ console.log('crm body', t); });
+      setTimeout(function(){ window.location = PAYNOW; }, 1200);
     }).catch(function(err){
       console.error('CRM capture failed', err);
-      if(statusEl) statusEl.textContent = 'Note: registration save failed, but payment will still open.';
+      if(statusEl) statusEl.textContent = 'Registration save failed: ' + (err && err.message ? err.message : 'unknown');
+      setTimeout(function(){ window.location = PAYNOW; }, 1200);
     });
-    setTimeout(function(){ window.location = PAYNOW; }, 900);
+    new Image().src = beaconUrl;
   });
 </script>
 
