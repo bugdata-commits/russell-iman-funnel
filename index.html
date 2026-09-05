@@ -104,7 +104,7 @@
             name: document.getElementById('name').value
           };
           try {
-            await fetch('http://127.0.0.1:8765/api/identify', {
+            await fetch('https://dover-sip-duties-procedures.trycloudflare.com/api/identify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
