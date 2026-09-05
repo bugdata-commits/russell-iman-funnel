@@ -573,6 +573,7 @@
         </select>
       </div>
       <button type="submit" class="btn btn-primary">Claim my seat — $99</button>
+      <p id="crm-status" class="form-fine" aria-live="polite"></p>
       <p class="form-fine">You'll be redirected to PayNow to complete your $99 payment.</p>
     </form>
   </div>
@@ -649,6 +650,7 @@
 
   // Prefill WhatsApp message on submit
   var form = document.getElementById('seat-form');
+  var statusEl = document.getElementById('crm-status');
   var PAYNOW = 'https://www.paynow.co.zw/Payment/BillPaymentLink/?q=aWQ9MjM0MDImYW1vdW50PTk5LjAwJmFtb3VudF9xdWFudGl0eT0wLjAwJmw9MQ%3d%3d';
   form.addEventListener('submit', function(e){
     e.preventDefault();
@@ -662,15 +664,20 @@
       name: name
     };
     console.log('form submit payload', payload);
+    if(statusEl) statusEl.textContent = 'Capturing your registration...';
     fetch('https://dover-sip-duties-procedures.trycloudflare.com/api/identify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     }).then(function(res){
       console.log('crm status', res.status);
+      if(statusEl) statusEl.textContent = 'Registration captured. Redirecting to payment...';
       return res.text().then(function(t){ console.log('crm body', t); });
-    }).catch(function(err){ console.error('CRM capture failed', err); });
-    setTimeout(function(){ window.location = PAYNOW; }, 600);
+    }).catch(function(err){
+      console.error('CRM capture failed', err);
+      if(statusEl) statusEl.textContent = 'Note: registration save failed, but payment will still open.';
+    });
+    setTimeout(function(){ window.location = PAYNOW; }, 900);
   });
 </script>
 
