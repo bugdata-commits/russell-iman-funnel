@@ -81,15 +81,40 @@
       <div class="plate-row"><span>Bulawayo, Zimbabwe</span><span>Oct 1, 2026</span></div>
       <div class="plate-price">$99 <span style="font-size:16px;color:#8a8f96;font-weight:500">USD</span></div>
       <div class="plate-foot">Price goes up when seats are gone. No exceptions.</div>
-      <form class="panel" onsubmit="event.preventDefault();window.location='https://www.paynow.co.zw/Payment/BillPaymentLink/?q=aWQ9MjM0MDImYW1vdW50PTk5LjAwJmFtb3VudF9xdWFudGl0eT0wLjAwJmw9MQ%3d%3d';">
+      <form class="panel" id="registerForm">
         <h3>Reserve your seat</h3>
-        <div class="field"><label>Full name</label><input type="text" placeholder="e.g. Tafara Dube" required></div>
-        <div class="field"><label>WhatsApp number</label><input type="tel" placeholder="+263 77 000 0000" required></div>
-        <div class="field"><label>Email</label><input type="email" placeholder="you@example.com" required></div>
-        <div class="field"><label>How did you hear about us?</label><select><option>WhatsApp</option><option>Instagram</option><option>Facebook</option><option>Friend</option><option>Other</option></select></div>
-        <button class="cta" type="submit">Claim My Seat — $99</button>
+        <div class="field"><label>Full name</label><input type="text" id="name" placeholder="e.g. Tafara Dube" required></div>
+        <div class="field"><label>WhatsApp number</label><input type="tel" id="phone" placeholder="+263 77 000 0000" required></div>
+        <div class="field"><label>Email</label><input type="email" id="email" placeholder="you@example.com" required></div>
+        <div class="field"><label>How did you hear about us?</label><select id="source"><option>WhatsApp</option><option>Instagram</option><option>Facebook</option><option>Friend</option><option>Other</option></select></div>
+        <button class="cta" type="submit" id="submitBtn">Claim My Seat — $99</button>
         <div class="spots">🔴 24 seats only. Once they’re gone, the challenge closes.</div>
       </form>
+      <script>
+        const PAYNOW = 'https://www.paynow.co.zw/Payment/BillPaymentLink/?q=aWQ9MjM0MDImYW1vdW50PTk5LjAwJmFtb3VudF9xdWFudGl0eT0wLjAwJmw9MQ%3d%3d';
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const btn = document.getElementById('submitBtn');
+          const originalText = btn.textContent;
+          btn.textContent = 'Securing your seat...';
+          btn.disabled = true;
+          const payload = {
+            phone: document.getElementById('phone').value.replace(/\s+/g, ''),
+            message: 'Event registration: ' + document.getElementById('name').value + ' | Source: ' + document.getElementById('source').value,
+            name: document.getElementById('name').value
+          };
+          try {
+            await fetch('http://127.0.0.1:8765/api/identify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          } catch (err) {
+            console.error('CRM capture failed', err);
+          }
+          window.location = PAYNOW;
+        });
+      </script>
     </div>
   </div>
 </section>
